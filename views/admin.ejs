@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+    <script>
+        // Disable form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                // Get the forms we want to add validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        function editbook(isbn, bookname, bookdescription, copies) {
+            document.getElementById("isbnEdit").value = isbn;
+            document.getElementById("booknameEdit").value = bookname;
+            document.getElementById("bookdescriptionEdit").value = bookdescription;
+            document.getElementById("copiesEdit").value = copies;
+        }
+
+        function deletebook(isbn, bookname) {
+            document.getElementById("isbnDelete").value = isbn;
+            document.getElementById("booknameDelete").value = bookname;
+        }
+    </script>
+    <style>
+        .totalbooks {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+        }
+        
+        .totalbooks>div {
+            margin-top: 2%;
+            margin-bottom: 2%;
+            margin-right: 5%;
+            margin-left: 5%;
+        }
+        
+        .tab-content {
+            background: #fdfdfd;
+            line-height: 25px;
+            border: 1px solid #ddd;
+            padding: 30px 25px;
+        }
+    </style>
+
+</head>
+
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="nav1">
+    <a class="navbar-brand " href="/" style=" padding-left:.5rem; display: inline-block; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
+        <img src="/static/icon.png" width="50" height="50" class="d-inline-block " alt="">Overlord_Library
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+        </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="nav nav-tabs mr-auto" id="myTab" role="tablist">
+        </ul>
+        <div class="dropdown m-lg-1 dropdown-menu-lg-end" style="padding-right:3rem;">
+            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-display="static" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Logged in as <%= uname%>    
+            </button>
+            <div class="dropdown-menu " aria-labelledby="dropdownMenuButton">
+
+                <a class="dropdown-item" href="" data-toggle="modal" data-target="#modalChangePassword">Change Password</a>
+                <a class="dropdown-item" href="/logout">Log Out</a>
+
+            </div>
+        </div>
+
+    </div>
+</nav>
+<nav>
+    <ul class="nav nav-tabs mr-auto" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="viewBooks-tab" data-toggle="tab" href="#viewBooks" role="tab" aria-controls="viewBooks" aria-selected="true">View Books</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="addBooks-tab" data-toggle="tab" href="#addBooks" role="tab" aria-controls="addBooks" aria-selected="true">Add Books</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" id="approveRequests-tab" data-toggle="tab" href="#approveRequests" role="tab" aria-controls="approveRequests" aria-selected="false">Approve Requests</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="acceptReturns-tab" data-toggle="tab" href="#acceptReturns" role="tab" aria-controls="acceptReturns" aria-selected="false">Accept Returns</a>
+        </li>
+    </ul>
+</nav>
+
+<body>
+
+    <div class="modal fade" id="modalChangePassword" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Change Password</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body mx-3">
+                    <form action="/changePassword" method="POST">
+                        <div class="form-group">
+                            <label for="currPass">Current Password</label>
+                            <input type="text" class="form-control" id="currPass" name="currPass" placeholder="Current Password"> </div>
+                        <div class="form-group">
+                            <label for="newPass">Password</label>
+                            <input type="password" class="form-control" id="newPass" name="newPass" placeholder="New Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassC">Confirm Password</label>
+                            <input type="password" class="form-control" id="newPassC" name="newPassC" placeholder="Confirm Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- edit  -->
+    <div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Edit</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body mx-3">
+                    <form action="/editbook" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="isbn">ISBN:</label>
+                            <input type="text" class="form-control" id="isbnEdit" placeholder="Enter ISBN" name="isbn" readonly>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookname">Book Name:</label>
+                            <input type="text" class="form-control" id="booknameEdit" placeholder="Enter Book name" name="bookname">
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookdescription">Book Description:</label>
+                            <textarea class="form-control" id="bookdescriptionEdit" placeholder="Enter Book Description" name="bookdescription"></textarea>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="copies">Copies:</label>
+                            <input type="number" min="0" max="99999" class="form-control" id="copiesEdit" placeholder="Enter Copies" name="copies">
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookcover">Bookcover:</label>
+                            <input type="file" accept='image/*' class="form-control" id="bookcoverEdit" placeholder="Upload image" name="bookcover">
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Please Upload Book cover.</div>
+
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- delete  -->
+    <div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Delete</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body mx-3">
+                    <form action="/deletebook" method="POST">
+                        <div class="form-group">
+                            <label for="isbn">ISBN:</label>
+                            <input type="text" class="form-control" id="isbnDelete" placeholder="Enter ISBN" name="isbn" readonly>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookname">Book Name:</label>
+                            <input type="text" class="form-control" id="booknameDelete" placeholder="Enter Book name" name="bookname" readonly>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Required.</div>
+                        </div>
+                        <p style="color: rgb(177, 19, 19);">Are you sure you want to delete?</p>
+
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs content -->
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="viewBooks" role="tabpanel" aria-labelledby="viewBooks-tab">
+            <center>
+                <div class="totalbooks">
+                    <%
+            if (totalbooks!=undefined) {
+            totalbooks.forEach(function(data){
+            %>
+                        <div class="card" style="width: 18rem; ">
+                            <img src=" <%= data.bookcoverpath %> " style="width:18em; height: 24em" class="card-img-top" alt="<%= data.bookname %>">
+                            <div class="card-body">
+                                <center>
+                                    <h3 class="card-title" style="color: rgb(62, 134, 230);">
+                                        <%= data.bookname %>
+                                    </h3>
+                                </center>
+
+                                <p class="card-text">ISBN:
+                                    <%= data.isbn %>
+                                </p>
+                                <p class="card-text">Copies:
+                                    <%= data.copies %>
+                                </p>
+                                <p class="card-text">
+                                    <button class="btn-primary" data-toggle="modal" data-target="#modalEdit" value="<%= data.isbn %>" onclick="editbook('<%= data.isbn %>','<%= data.bookname %>','<%= data.bookdescription %>','<%= data.copies %>')">Edit</button>
+                                    <button class="btn-danger" data-toggle="modal" data-target="#modalDelete" value="<%= data.isbn %>" onclick="deletebook('<%= data.isbn %>','<%= data.bookname %>')">Delete</button>
+                                </p>
+                                <%
+                        if (data.bookdescription){
+                        %>
+                                    <p class="card-text">Description:
+                                        <%= data.bookdescription %><br></p>
+                                    <% } %>
+                            </div>
+                        </div>
+
+                        <%  }) %>
+                            <% } else{ %>
+                                <center>
+                                    <h3>NO DATA FOUND</h3>
+                                </center>
+                                <% } %>
+                </div>
+            </center>
+        </div>
+        <div class="tab-pane fade" id="addBooks" role="tabpanel" aria-labelledby="addBooks-tab">
+            <form action="/addbooks" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="isbn">ISBN:</label>
+                    <input type="text" class="form-control" id="isbn" placeholder="Enter ISBN" name="isbn" required>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Required.</div>
+                </div>
+                <div class="form-group">
+                    <label for="bookname">Book Name:</label>
+                    <input type="text" class="form-control" id="bookname" placeholder="Enter Book name" name="bookname" required>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Required.</div>
+                </div>
+                <div class="form-group">
+                    <label for="bookdescription">Book Description:</label>
+                    <textarea class="form-control" id="bookdescription" placeholder="Enter Book Description" name="bookdescription" required></textarea>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Required.</div>
+                </div>
+                <div class="form-group">
+                    <label for="copies">Copies:</label>
+                    <input type="number" min="0" max="99999" class="form-control" id="copies" placeholder="Enter Copies" name="copies" required>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Required.</div>
+                </div>
+                <div class="form-group">
+                    <label for="bookcover">Bookcover:</label>
+                    <input type="file" accept='image/*' class="form-control" id="bookcover" placeholder="Upload image" name="bookcover" required>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Please Upload Book cover.</div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="approveRequests" role="tabpanel" aria-labelledby="approveRequests-tab">
+            <div class="table-data">
+
+                <table class="table table-striped table-hover" style="margin-top:1.5%">
+                    <tr>
+                        <th>Sno.</th>
+                        <th>Username</th>
+                        <th>Book Cover</th>
+                        <th>ISBN</th>
+                        <th>Book Name</th>
+                        <th>Approve</th>
+                    </tr>
+
+                    <% if(approverequests[0]!=undefined){ var i=1; approverequests.forEach(function(data){ %>
+                        <tr>
+                            <td>
+                                <%= i %>
+                            </td>
+                            <td>
+                                <%=data.uname %>
+                            </td>
+                            <td>
+                                <img src=" <%= data.bookcoverpath %> " style="width:150px; height: 200px" class="card-img-top" alt="<%= data.bookname %>">
+                            </td>
+                            <td>
+                                <%=data.isbn %>
+                            </td>
+                            <td>
+                                <%=data.bookname %>
+                            </td>
+                            <td>
+                                <form action="/approveissues" method="POST"><input type="text" value="<%=data.isbn %>" name="isbn" readonly style="display:none;"> <input type="text" value="<%=data.uname %>" name="uname" readonly style="display:none;"> <input type="submit" class="btn-success" value="Approve"></form>
+                            </td>
+                        </tr>
+                        <% i++; }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6">
+                                        <h3>No Requests to approve.</h3>
+                                    </td>
+                                </tr>
+                                <% } %>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="acceptReturns" role="tabpanel" aria-labelledby="acceptReturns-tab">
+            <div class="table-data">
+
+                <table class="table table-striped table-hover" style="margin-top:1.5%">
+                    <tr>
+                        <th>Sno.</th>
+                        <th>Username</th>
+                        <th>Book Cover</th>
+                        <th>ISBN</th>
+                        <th>Book Name</th>
+                        <th>Accept</th>
+                    </tr>
+
+                    <% if(approvereturns[0]!=undefined){ var i=1; approvereturns.forEach(function(data){ %>
+                        <tr>
+                            <td>
+                                <%= i %>
+                            </td>
+                            <td>
+                                <%=data.uname %>
+                            </td>
+                            <td>
+                                <img src=" <%= data.bookcoverpath %> " style="width:150px; height: 200px" class="card-img-top" alt="<%= data.bookname %>">
+                            </td>
+                            <td>
+                                <%=data.isbn %>
+                            </td>
+                            <td>
+                                <%=data.bookname %>
+                            </td>
+                            <td>
+                                <form action="/approvereturns" method="POST"><input type="text" value="<%=data.isbn %>" name="isbn" readonly style="display:none;"> <input type="text" value="<%=data.uname %>" name="uname" readonly style="display:none;"> <input type="submit" class="btn-success" value="Accept"></form>
+                            </td>
+                        </tr>
+                        <% i++; }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6">
+                                        <h3>No Requests to approve.</h3>
+                                    </td>
+                                </tr>
+                                <% } %>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs content -->
+
+
+</body>
+
+</html>

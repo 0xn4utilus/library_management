@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <style>
+        .totalbooks {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            width: 90%;
+        }
+        
+        .totalbooks>div {
+            margin: 5%;
+        }
+    </style>
+</head>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="nav1">
+    <a class="navbar-brand " href="/" style=" padding-left:.5rem; display: inline-block; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
+        <img src="/static/icon.png" width="50" height="50" class="d-inline-block " alt="">Overlord_Library
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+        </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="nav nav-tabs mr-auto" id="myTab" role="tablist">
+        </ul>
+        <div class="dropdown m-lg-1 dropdown-menu-lg-end" style="padding-right:3rem;">
+            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-display="static" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Logged in as <%= uname%>    
+            </button>
+            <div class="dropdown-menu " aria-labelledby="dropdownMenuButton">
+
+                <a class="dropdown-item" href="" data-toggle="modal" data-target="#modalChangePassword">Change Password</a>
+                <a class="dropdown-item" href="/logout">Log Out</a>
+
+            </div>
+        </div>
+
+    </div>
+</nav>
+<nav>
+    <ul class="nav nav-tabs mr-auto" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="viewBooks-tab" data-toggle="tab" href="#viewBooks" role="tab" aria-controls="viewBooks" aria-selected="true">View Books</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="issuebooks-tab" data-toggle="tab" href="#issuebooks" role="tab" aria-controls="issuebooks" aria-selected="true">Issue Books</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="returnbooks-tab" data-toggle="tab" href="#returnbooks" role="tab" aria-controls="returnbooks" aria-selected="false">Return Books</a>
+        </li>
+
+</nav>
+
+<body>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="viewBooks" role="tabpanel" aria-labelledby="viewBooks-tab">
+            <center>
+                <div class="totalbooks">
+                    <%
+            if (totalbooks!=undefined) {
+            totalbooks.forEach(function(data){
+            %>
+                        <div class="card" style="width: 300px; ">
+                            <img src=" <%= data.bookcoverpath %> " style="width:300px; height: 400px" class="card-img-top" alt="<%= data.bookname %>">
+                            <div class="card-body">
+                                <center>
+                                    <h3 class="card-title" style="color: rgb(62, 134, 230);">
+                                        <%= data.bookname %>
+                                    </h3>
+                                </center>
+
+                                <p class="card-text">ISBN:
+                                    <%= data.isbn %>
+                                </p>
+                                <p class="card-text">Copies:
+                                    <%= data.copies %>
+                                </p>
+                                <%
+                        if (data.bookdescription){
+                        %>
+                                    <p class="card-text">Description:
+                                        <%= data.bookdescription %><br></p>
+                                    <% } %>
+                            </div>
+                        </div>
+
+                        <%  }) %>
+                            <% } else{ %>
+                                <center>
+                                    <h3>NO DATA FOUND</h3>
+                                </center>
+                                <% } %>
+                </div>
+            </center>
+        </div>
+        <div class="tab-pane fade" id="issuebooks" role="tabpanel" aria-labelledby="issuebooks-tab">
+            <div class="table-data">
+
+                <table class="table table-striped table-hover" style="margin-top:1.5%">
+                    <tr>
+                        <th>Sno.</th>
+                        <th>Book Cover</th>
+                        <th>ISBN</th>
+                        <th>Book Name</th>
+                        <th>Issue</th>
+                    </tr>
+
+                    <% if(newissuebooks[0]!=undefined){ var i=1; newissuebooks.forEach(function(data){ %>
+                        <tr>
+                            <td>
+                                <%= i %>
+                            </td>
+                            <td>
+                                <img src=" <%= data.bookcoverpath %> " style="width:150px; height: 200px" class="card-img-top" alt="<%= data.bookname %>">
+                            </td>
+                            <td>
+                                <%=data.isbn %>
+                            </td>
+                            <td>
+                                <%=data.bookname %>
+                            </td>
+                            <td>
+                                <form action="/newissue" method="POST"><input type="text" value="<%=data.isbn %>" name="isbn" readonly style="display:none;"> <input type="submit" class="btn-primary" value="Issue"></form>
+                            </td>
+                        </tr>
+                        <% i++; }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5">
+                                        <h3>No books found to issue</h3>
+                                    </td>
+                                </tr>
+
+                                <% } %>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="returnbooks" role="tabpanel" aria-labelledby="returnbooks-tab">
+            <div class="table-data">
+
+                <table class="table table-striped table-hover" style="margin-top:1.5%">
+                    <tr>
+                        <th>Sno.</th>
+                        <th>Book Cover</th>
+                        <th>ISBN</th>
+                        <th>Book Name</th>
+                        <th>Return</th>
+                    </tr>
+
+                    <% if(issuedbooks[0]!=undefined){ var i=1; issuedbooks.forEach(function(data){ %>
+                        <tr>
+                            <td>
+                                <%= i %>
+                            </td>
+                            <td>
+                                <img src=" <%= data.bookcoverpath %> " style="width:150px; height: 200px" class="card-img-top" alt="<%= data.bookname %>">
+                            </td>
+                            <td>
+                                <%=data.isbn %>
+                            </td>
+                            <td>
+                                <%=data.bookname %>
+                            </td>
+                            <td>
+                                <form action="/newreturn" method="POST"><input type="text" value="<%=data.isbn %>" name="isbn" readonly style="display:none;"> <input type="submit" class="btn-danger" value="Return"></form>
+                            </td>
+                        </tr>
+                        <% i++; }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5">
+                                        <h3>No issued books</h3>
+                                    </td>
+                                </tr>
+                                <% } %>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal fade" id="modalChangePassword" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Change Password</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body mx-3">
+                    <form action="/changePassword" method="POST">
+                        <div class="form-group">
+                            <label for="currPass">Current Password</label>
+                            <input type="text" class="form-control" id="currPass" name="currPass" placeholder="Current Password"> </div>
+                        <div class="form-group">
+                            <label for="newPass">Password</label>
+                            <input type="password" class="form-control" id="newPass" name="newPass" placeholder="New Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassC">Confirm Password</label>
+                            <input type="password" class="form-control" id="newPassC" name="newPassC" placeholder="Confirm Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
